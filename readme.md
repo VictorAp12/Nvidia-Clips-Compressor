@@ -36,3 +36,29 @@ This project is primarily intended for:
 - High FPS video footage (60–144 FPS)
 
 It also works with any standard video file, but gameplay clips are the main focus.
+
+## Installation
+
+  ### As a Python Project
+
+  - Download the project as a zip or using git clone https://github.com/VictorAp12/Nvidia-Clips-Compressor.git
+
+  - Create a virtual environment in the project folder:
+    ```bash
+    python -m venv venv
+    ````
+
+  - Activate the virtual environment in the project folder:
+    ```bash
+    venv\Scripts\activate
+    ```
+
+  - Install the project dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+  - Run the main.py:
+    ```bash
+    python -m main
+    ```
