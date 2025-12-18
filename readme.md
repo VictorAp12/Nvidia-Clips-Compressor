@@ -36,14 +36,3 @@ This project is primarily intended for:
 - High FPS video footage (60–144 FPS)
 
 It also works with any standard video file, but gameplay clips are the main focus.
-
----
-
-## Installation (Recommended)
-
-### Windows Installer
-
-The easiest way to install the application is by using the **Windows installer**.
-
-1. Go to the **Releases** page on GitHub
-2. Download the latest installer:
