@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+venv/
+build/
+dist/
+*.spec
+installer/Output/
+config.json
+ffmpeg/*.exe
+.vscode/
