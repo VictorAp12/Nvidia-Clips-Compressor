@@ -7,6 +7,8 @@ The application reduces file size while preserving visual quality,
 resolution, frame rate and metadata. It is optimized for high-FPS
 gameplay footage, but can also be used with any standard video file.
 
+<img width="492" height="282" alt="image" src="https://github.com/user-attachments/assets/0dc41f27-d6bf-4877-8b48-6044285bd911" />
+
 ---
 
 ## Features
