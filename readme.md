@@ -84,14 +84,12 @@ The application prioritizes speed and practicality over heavy filtering.
 
 ## Installation
 
-  ### Windows Installer
+  ### Windows Installer (Recommended)
 
-  The easiest way to install the application is by using the **Windows installer**.
-
-  1. Go to the **Releases** page on GitHub
-  2. Download the latest installer:
-  3. Run the installer
-  4. Follow the setup wizard
+  1. Download the installer from the Releases page:  
+     https://github.com/VictorAp12/Nvidia-Clips-Compressor/releases/tag/v1.0.1
+  2. Run the installer
+  3. Follow the setup wizard
 
   The installer will:
   - Install the application in a folder selected by the user
