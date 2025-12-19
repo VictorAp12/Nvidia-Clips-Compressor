@@ -3,6 +3,9 @@ import json
 import time
 import os
 import signal
+from pathlib import Path
+import sys
+
 
 VIDEO_EXTS = (".mp4", ".mkv", ".mov")
 AUDIO_BITRATE = "192k"
@@ -10,9 +13,15 @@ NVENC_PRESET = "p5"
 CPU_PRESET = "medium"
 
 
-def get_video_info(video):
+def get_ffmpeg_path(name: str) -> str:
+    if getattr(sys, "frozen", False):
+        return str(Path(sys._MEIPASS) / "ffmpeg" / name)
+    return str(Path("ffmpeg") / name)
+
+
+def get_video_info(video_path):
     cmd = [
-        "ffprobe",
+        get_ffmpeg_path("ffprobe.exe"),
         "-v",
         "error",
         "-select_streams",
@@ -21,11 +30,26 @@ def get_video_info(video):
         "stream=height,duration",
         "-of",
         "json",
-        str(video),
+        str(video_path),
     ]
-    r = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    s = json.loads(r.stdout)["streams"][0]
-    return int(s["height"]), float(s["duration"])
+
+    r = subprocess.run(
+        cmd,
+        capture_output=True,
+        text=True,
+        creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+    )
+
+    if r.returncode != 0:
+        raise RuntimeError(f"ffprobe failed for: {video_path}")
+
+    data = json.loads(r.stdout)
+    stream = data["streams"][0]
+
+    height = int(stream.get("height", 1080))
+    duration = float(stream.get("duration", 0))
+
+    return height, duration
 
 
 def cq_by_resolution(height):
@@ -39,8 +63,22 @@ def cq_by_resolution(height):
 
 def run_ffmpeg(cmd, duration, label, gui, index, total):
     start = time.time()
+
+    startupinfo = None
+    creationflags = 0
+
+    if sys.platform == "win32":
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        creationflags = subprocess.CREATE_NO_WINDOW
+
     p = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+        startupinfo=startupinfo,
+        creationflags=creationflags,
     )
 
     gui.pause_btn["state"] = "normal"

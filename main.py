@@ -1,12 +1,14 @@
 from pathlib import Path
 import os
 import threading
+import time
 from gui import AppGUI
 from ffmpeg_utils import (
     VIDEO_EXTS,
     get_video_info,
     cq_by_resolution,
     run_ffmpeg,
+    get_ffmpeg_path,
 )
 from tkinter import messagebox
 
@@ -41,7 +43,11 @@ def worker(input_dir, output_dir, recursive, overwrite, gui):
             temp_out = out
             final_out = out
 
-        height, duration = get_video_info(video)
+        try:
+            height, duration = get_video_info(video)
+        except Exception:
+            height, duration = 1080, 0
+
         cq = cq_by_resolution(height)
         label = f"[{i}/{total}] {video.name}"
 
@@ -49,7 +55,7 @@ def worker(input_dir, output_dir, recursive, overwrite, gui):
 
         if codec == "h265":
             nvenc = [
-                "ffmpeg",
+                get_ffmpeg_path("ffmpeg"),
                 "-y",
                 "-hwaccel",
                 "cuda",
@@ -83,7 +89,7 @@ def worker(input_dir, output_dir, recursive, overwrite, gui):
         else:
             # H.264 (Default, faster)
             nvenc = [
-                "ffmpeg",
+                get_ffmpeg_path("ffmpeg"),
                 "-y",
                 "-hwaccel",
                 "cuda",
@@ -119,7 +125,7 @@ def worker(input_dir, output_dir, recursive, overwrite, gui):
         if run_ffmpeg(nvenc, duration, label, gui, i, total) != 0:
             # fallback CPU (security)
             cpu = [
-                "ffmpeg",
+                get_ffmpeg_path("ffmpeg"),
                 "-y",
                 "-i",
                 str(video),
@@ -147,7 +153,15 @@ def worker(input_dir, output_dir, recursive, overwrite, gui):
             run_ffmpeg(cpu, duration, label, gui, i, total)
 
         if same_folder and temp_out.exists():
-            temp_out.replace(final_out)
+            for _ in range(10):
+                try:
+                    if final_out.exists():
+                        final_out.unlink()
+                    temp_out.replace(final_out)
+                    break
+                except PermissionError:
+                    time.sleep(0.2)
+
 
     gui.start_btn["state"] = "normal"
     gui.pause_btn["state"] = "disabled"
